@@ -28,11 +28,11 @@ class Model(object):
 
         self.seq_start_token = None
         self.seq_end_token = None
-        self.encode_rnn_size = 50
+        self.encode_rnn_size = 64
         self.encode_layer_size = 2
-        self.decode_rnn_size = 50
+        self.decode_rnn_size = 64
         self.decode_layer_size = 2
-        self.atten_depth = 50 #The depth of the query mechanism
+        self.atten_depth = 128 #The depth of the query mechanism
 
         self.g_embeddings = tf.Variable(self.init_matrix([self.num_emb, self.emb_dim]))
         
@@ -48,7 +48,7 @@ class Model(object):
         
         encoder_output, encoder_state = self.get_encoder_layer(self.processed_x, self.encode_rnn_size, self.encode_layer_size, self.target_sequence_length) #sourse seqlenth
 
-        training_decoder_output = self.decoding_layer(
+        training_decoder_output, final_state = self.decoding_layer(
             self.decode_layer_size, 
             self.decode_rnn_size,
             self.target_sequence_length,
@@ -60,11 +60,13 @@ class Model(object):
         #######################################################################################################
         #  Training
         #######################################################################################################
-        # self.g_pretrain_predictions = training_decoder_output.rnn_output
-        self.g_pretrain_sample = training_decoder_output.sample_id #batch_size * labels
-        print("self.g_pretrain_sample: ", self.g_pretrain_sample)
+        self.g_pretrain_xxx = training_decoder_output.rnn_output
+        self.g_pretrain_predictions = self.g_pretrain_xxx[:,tf.shape(self.g_pretrain_xxx)[1]-1,:]
+        #self.g_pretrain_sample = training_decoder_output.sample_id #batch_size * labels
+        #print("self.g_pretrain_sample: ", self.g_pretrain_sample)
+        #print("self.final_state: ", final_state)
 
-        self.pretrain_loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.g_pretrain_sample, labels=self.input_y)
+        self.pretrain_loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.g_pretrain_predictions, labels=self.input_y)
 
         pretrain_opt = self.g_optimizer(self.learning_rate)
 
@@ -76,8 +78,8 @@ class Model(object):
         #return tf.random_normal(shape, stddev=0.1)
         
         #TODO decide start & end
-        self.seq_start_token = 2
-        self.seq_end_token = 3
+        self.seq_start_token = 1
+        self.seq_end_token = 2
 
         embeddings = tf.get_variable("embeddings", shape=self.emb_data.shape, initializer=tf.constant_initializer(self.emb_data), trainable=True)
         return embeddings
@@ -209,11 +211,11 @@ class Model(object):
                                                             training_helper,
                                                             attn_cell.zero_state(dtype=tf.float32, batch_size=self.batch_size),
                                                             output_layer) 
-            training_decoder_output, _, _ = tf.contrib.seq2seq.dynamic_decode(training_decoder,
+            training_decoder_output, final_state, _ = tf.contrib.seq2seq.dynamic_decode(training_decoder,
                                                                         impute_finished=True,
                                                                         maximum_iterations=max_target_sequence_length)
         
-        return training_decoder_output
+        return training_decoder_output, final_state
     
     # def get_samples(self, sess, input_x, given_num, input_len):
     #     '''
@@ -234,11 +236,11 @@ class Model(object):
     #     return outputs
 
     def train_step(self, sess, x, x_len, y_batch):
-        outputs = sess.run([self.pretrain_loss, self.pretrain_updates, self.g_pretrain_sample], feed_dict={self.x: x, self.target_sequence_length: x_len, self.labels: y_batch})
+        outputs = sess.run([self.pretrain_loss, self.pretrain_updates, self.g_pretrain_predictions], feed_dict={self.x: x, self.target_sequence_length: x_len, self.input_y: y_batch})
         return outputs
     
     def test_step(self, sess, x, x_len, y_batch):
-        outputs = sess.run([self.pretrain_loss, self.g_pretrain_sample], feed_dict={self.x: x, self.target_sequence_length: x_len, self.labels: y_batch})
+        outputs = sess.run([self.pretrain_loss, self.g_pretrain_predictions], feed_dict={self.x: x, self.target_sequence_length: x_len, self.input_y: y_batch})
         return outputs
 
     def g_optimizer(self, *args, **kwargs):

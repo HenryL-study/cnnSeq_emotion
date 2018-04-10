@@ -15,10 +15,10 @@ from keras.preprocessing.sequence import pad_sequences
 
 
 #Parameters
-embedding_size = 25
-glove_embedding_filename = 'glove.twitter.27B.25d.txt'
-pos_filename = 'data/aaa.txt' #'question-simple.txt'
-neg_filename = 'data/bbb.txt'
+embedding_size = 200
+glove_embedding_filename = 'data/glove.twitter.27B.200d.txt'
+pos_filename = 'data/movie-review/pos.txt' #'question-simple.txt'
+neg_filename = 'data/movie-review/neg.txt'
 
 processed_pos_filename = 'data/pos-vec.txt'
 processed_pos_ques_len = 'data/pos-len.txt'
@@ -30,7 +30,7 @@ index_to_word = 'data/index_to_word.txt'
 
 pos_ques = []
 MAX_LENGTH = 0
-file = open(pos_filename,'r')
+file = codecs.open(pos_filename,'r', 'utf-8', errors = 'ignore')
 for line in file.readlines():
     row = 'starttrats ' + line.strip() + ' enddne'
     row_ = text_to_word_sequence(row)
@@ -39,7 +39,7 @@ for line in file.readlines():
 file.close()
 
 neg_ques = []
-file = open(neg_filename,'r')
+file = codecs.open(neg_filename,'r', 'utf-8', errors = 'ignore')
 for line in file.readlines():
     row = 'starttrats ' + line.strip() + ' enddne'
     row_ = text_to_word_sequence(row)
@@ -143,7 +143,7 @@ print("ques_len_static:\n", ques_len_static)
 #print(sequences_train[0])
 # # Auto filled with 0
 # remove MAX_LENGTH setting below to use the max length of all sentences.
-MAX_LENGTH = 100
+MAX_LENGTH = 50
 pos_data_train = pad_sequences(pos_sequences, maxlen = MAX_LENGTH, padding='post', truncating='post')
 neg_data_train = pad_sequences(neg_sequences, maxlen = MAX_LENGTH, padding='post', truncating='post')
 
@@ -165,7 +165,8 @@ for word, i in word_index.items():
 
 in_w = codecs.open(index_to_word,'w', 'utf-8')
 for i, word in in_to_word.items():
-    in_w.write(str(i) + ' ' + unicode(word, 'utf8')+'\n')
+    in_w.write(str(i) + ' ')
+    in_w.write(word +'\n')
 in_w.close()
 
 np.save(processed_glove,embedding_matrix)
@@ -175,7 +176,7 @@ np.savetxt(processed_neg_filename,neg_data_train, fmt="%d", delimiter=' ')
 print("Processing done.")
 print("Max length: ", MAX_LENGTH)
 print("Embedding shape: ", embedding_matrix.shape)
-print("Data shape: ", data_train.shape)
+print("Data shape: ", pos_data_train.shape, neg_data_train.shape)
 
 
 # #Word embedding

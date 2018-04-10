@@ -11,11 +11,11 @@ from cnnSeq_model import Model
 #########################################################################################
 #  Model  Hyper-parameters
 ######################################################################################
-HIDDEN_DIM = 32 # hidden state dimension of lstm cell
-SEQ_LENGTH = 100 # sequence length TODO need processing data
+HIDDEN_DIM = 128 # hidden state dimension of lstm cell
+SEQ_LENGTH = 50 # sequence length TODO need processing data
 START_TOKEN = 1 # no use
 PRE_EPOCH_NUM = 60 # supervise (maximum likelihood estimation) epochs
-BATCH_SIZE = 40
+BATCH_SIZE = 64
 labels = 2
 gen_filter_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20]
 gen_num_filters = [100, 200, 200, 200, 200, 100, 100, 100, 100, 100, 160, 160]
@@ -27,11 +27,11 @@ sess = tf.InteractiveSession()
 #Parameters
 src_vocab_size = None
 embedding_size = None
-glove_embedding_filename = 'data/Informatique/glove-vec.npy'
-positive_file = ''
-positive_len_file = '' 
-negative_file = ''
-negative_len_file = ''
+glove_embedding_filename = 'data/glove-vec.npy'
+positive_file = 'data/pos-vec.txt'
+positive_len_file = 'data/pos-len.txt' 
+negative_file = 'data/neg-vec.txt'
+negative_len_file = 'data/neg-len.txt'
 
 #Word embedding
 def loadGloVe(filename):
@@ -62,6 +62,7 @@ def train_epoch(sess, trainable_model, data_loader):
 
     for it in range(data_loader.total_batch):
         x_batch, x_batch_len, y_batch = data_loader.next_batch()
+        print(y_batch)
         loss, _, sample = emotion_model.train_step(sess, x_batch, x_batch_len, y_batch)
         # print("sample shape: ", sample[0])
         supervised_g_losses.append(loss)

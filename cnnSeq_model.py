@@ -61,9 +61,14 @@ class Model(object):
         #  Training
         #######################################################################################################
         self.g_pretrain_xxx = training_decoder_output.rnn_output
-        self.g_pretrain_predictions = self.g_pretrain_xxx[:,tf.shape(self.g_pretrain_xxx)[1]-1,:]
+        self.g_pretrain_predictions = self.g_pretrain_xxx[i,self.target_sequence_length[0]-1,:]
+        for i in range(self.batch_size-1):
+            self.g_pretrain_predictions = tf.concat([self.g_pretrain_predictions, self.g_pretrain_xxx[i+1,self.target_sequence_length[i+1]-1,:]], 0)
+
+
+        #self.g_pretrain_predictions = self.g_pretrain_xxx[:,tf.shape(self.g_pretrain_xxx)[1]-1,:]
         #self.g_pretrain_sample = training_decoder_output.sample_id #batch_size * labels
-        #print("self.g_pretrain_sample: ", self.g_pretrain_sample)
+        print("self.g_pretrain_predictions: ", self.g_pretrain_predictions)
         #print("self.final_state: ", final_state)
 
         self.pretrain_loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.g_pretrain_predictions, labels=self.input_y)

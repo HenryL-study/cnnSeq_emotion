@@ -58,31 +58,38 @@ def train_epoch(sess, trainable_model, data_loader):
     # Pre-train the generator using MLE for one epoch
     supervised_g_losses = []
     supervised_g_test_losses = []
+    train_acc = []
+    test_acc = []
     data_loader.reset_pointer()
 
     for it in range(data_loader.total_batch):
         x_batch, x_batch_len, y_batch = data_loader.next_batch()
-        print(y_batch)
-        loss, _, sample = emotion_model.train_step(sess, x_batch, x_batch_len, y_batch)
+        loss, _, sample, acc = emotion_model.train_step(sess, x_batch, x_batch_len, y_batch)
         # print("sample shape: ", sample[0])
         supervised_g_losses.append(loss)
+        train_acc.append(acc)
 
     for it in range(data_loader.num_test_batch):
         x_batch, x_batch_len, y_batch = data_loader.next_test_batch()
-        test_loss, sample = emotion_model.test_step(sess, x_batch, x_batch_len, y_batch)
+        test_loss, sample, t_acc = emotion_model.test_step(sess, x_batch, x_batch_len, y_batch)
         # print("sample shape: ", sample[0])
         supervised_g_test_losses.append(test_loss)
+        test_acc.append(t_acc)
 
-    return np.mean(supervised_g_losses), np.mean(supervised_g_test_losses), sample
+    return np.mean(supervised_g_losses), np.mean(supervised_g_test_losses), sample, np.mean(train_acc), np.mean(test_acc)
 
 #  pre-train generator
 print ('Start training...')
 dataloader.load_train_data(positive_file, positive_len_file, negative_file, negative_len_file)
 for epoch in range(PRE_EPOCH_NUM):
-    loss, test_loss, sample = train_epoch(sess, emotion_model, dataloader)
+    loss, test_loss, sample, trainacc, testacc = train_epoch(sess, emotion_model, dataloader)
     if epoch % 1 == 0:
-        print ('train epoch ', epoch, 'generator_loss ', loss, 'test_loss ', test_loss)
+        print ('train epoch ', epoch, 'train_loss ', loss, 'test_loss ', test_loss, 'train acc: ', trainacc, 'test acc: ', testacc)
 
 
 
+print("saving model...")
+saver = tf.train.Saver()
+saver.save(sess, "save/model/model.ckpt")
+print("Done")
 

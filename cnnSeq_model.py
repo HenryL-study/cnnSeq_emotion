@@ -67,6 +67,8 @@ class Model(object):
         #print("self.final_state: ", final_state)
 
         self.pretrain_loss = tf.nn.softmax_cross_entropy_with_logits(logits=self.g_pretrain_predictions, labels=self.input_y)
+        pred = tf.equal(tf.argmax(self.g_pretrain_predictions, 1), tf.argmax(self.input_y, 1))
+        self.acc = tf.reduce_mean(tf.cast(pred, tf.float32))
 
         pretrain_opt = self.g_optimizer(self.learning_rate)
 
@@ -236,11 +238,11 @@ class Model(object):
     #     return outputs
 
     def train_step(self, sess, x, x_len, y_batch):
-        outputs = sess.run([self.pretrain_loss, self.pretrain_updates, self.g_pretrain_predictions], feed_dict={self.x: x, self.target_sequence_length: x_len, self.input_y: y_batch})
+        outputs = sess.run([self.pretrain_loss, self.pretrain_updates, self.g_pretrain_predictions, self.acc], feed_dict={self.x: x, self.target_sequence_length: x_len, self.input_y: y_batch})
         return outputs
     
     def test_step(self, sess, x, x_len, y_batch):
-        outputs = sess.run([self.pretrain_loss, self.g_pretrain_predictions], feed_dict={self.x: x, self.target_sequence_length: x_len, self.input_y: y_batch})
+        outputs = sess.run([self.pretrain_loss, self.g_pretrain_predictions, self.acc], feed_dict={self.x: x, self.target_sequence_length: x_len, self.input_y: y_batch})
         return outputs
 
     def g_optimizer(self, *args, **kwargs):

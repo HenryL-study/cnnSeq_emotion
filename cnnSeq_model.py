@@ -61,9 +61,10 @@ class Model(object):
         #  Training
         #######################################################################################################
         self.g_pretrain_xxx = training_decoder_output.rnn_output
-        self.g_pretrain_predictions = self.g_pretrain_xxx[i,self.target_sequence_length[0]-1,:]
+        self.g_pretrain_predictions = tf.expand_dims(self.g_pretrain_xxx[0,self.target_sequence_length[0]-1,:], 0)
+        print("self.g_pretrain_predictions: ", self.g_pretrain_predictions)
         for i in range(self.batch_size-1):
-            self.g_pretrain_predictions = tf.concat([self.g_pretrain_predictions, self.g_pretrain_xxx[i+1,self.target_sequence_length[i+1]-1,:]], 0)
+            self.g_pretrain_predictions = tf.concat([self.g_pretrain_predictions, tf.expand_dims(self.g_pretrain_xxx[i+1,self.target_sequence_length[i+1]-1,:], 0)], 0)
 
 
         #self.g_pretrain_predictions = self.g_pretrain_xxx[:,tf.shape(self.g_pretrain_xxx)[1]-1,:]

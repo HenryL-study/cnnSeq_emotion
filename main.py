@@ -71,7 +71,7 @@ def train_epoch(sess, trainable_model, data_loader):
 
     for it in range(data_loader.num_test_batch):
         x_batch, x_batch_len, y_batch = data_loader.next_test_batch()
-        test_loss, sample, t_acc = emotion_model.test_step(sess, x_batch, x_batch_len, y_batch)
+        test_loss, tsample, t_acc = emotion_model.test_step(sess, x_batch, x_batch_len, y_batch)
         # print("sample shape: ", sample[0])
         supervised_g_test_losses.append(test_loss)
         test_acc.append(t_acc)
@@ -84,7 +84,8 @@ dataloader.load_train_data(positive_file, positive_len_file, negative_file, nega
 for epoch in range(PRE_EPOCH_NUM):
     loss, test_loss, sample, trainacc, testacc = train_epoch(sess, emotion_model, dataloader)
     if epoch % 1 == 0:
-        print ('train epoch ', epoch, 'train_loss ', loss, 'test_loss ', test_loss, 'train acc: ', trainacc, 'test acc: ', testacc)
+        print('train epoch ', epoch, 'train_loss ', loss, 'test_loss ', test_loss, 'train acc: ', trainacc, 'test acc: ', testacc)
+        #print('sample: ', sample)
 
 
 

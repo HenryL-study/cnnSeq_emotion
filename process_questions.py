@@ -82,27 +82,27 @@ for seq in pos_sequences:
         pos_ques_len.write(" ")
     elif len(seq) < 100:
         ques_len_static[1] += 1
-        pos_ques_len.write(str(len(seq)))
+        pos_ques_len.write("50")
         pos_ques_len.write(" ")
     elif len(seq) < 200:
         ques_len_static[2] += 1
-        pos_ques_len.write("100")
+        pos_ques_len.write("50")
         pos_ques_len.write(" ")
     elif len(seq) < 300:
         ques_len_static[3] += 1
-        pos_ques_len.write("100")
+        pos_ques_len.write("50")
         pos_ques_len.write(" ")
     elif len(seq) < 400:
         ques_len_static[4] += 1
-        pos_ques_len.write("100")
+        pos_ques_len.write("50")
         pos_ques_len.write(" ")
     elif len(seq) < 500:
         ques_len_static[5] += 1
-        pos_ques_len.write("100")
+        pos_ques_len.write("50")
         pos_ques_len.write(" ")
     else:
         ques_len_static[6] += 1
-        pos_ques_len.write("100")
+        pos_ques_len.write("50")
         pos_ques_len.write(" ")
 pos_ques_len.close()
 
@@ -114,27 +114,27 @@ for seq in pos_sequences:
         neg_ques_len.write(" ")
     elif len(seq) < 100:
         ques_len_static[1] += 1
-        neg_ques_len.write(str(len(seq)))
+        neg_ques_len.write("50")
         neg_ques_len.write(" ")
     elif len(seq) < 200:
         ques_len_static[2] += 1
-        neg_ques_len.write("100")
+        neg_ques_len.write("50")
         neg_ques_len.write(" ")
     elif len(seq) < 300:
         ques_len_static[3] += 1
-        neg_ques_len.write("100")
+        neg_ques_len.write("50")
         neg_ques_len.write(" ")
     elif len(seq) < 400:
         ques_len_static[4] += 1
-        neg_ques_len.write("100")
+        neg_ques_len.write("50")
         neg_ques_len.write(" ")
     elif len(seq) < 500:
         ques_len_static[5] += 1
-        neg_ques_len.write("100")
+        neg_ques_len.write("50")
         neg_ques_len.write(" ")
     else:
         ques_len_static[6] += 1
-        neg_ques_len.write("100")
+        neg_ques_len.write("50")
         neg_ques_len.write(" ")
 neg_ques_len.close()
 
